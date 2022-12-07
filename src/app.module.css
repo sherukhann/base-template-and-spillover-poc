@@ -1,0 +1,72 @@
+*{
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.main {
+  width: 100vw;
+  height: 100vh;
+}
+
+.page{
+  margin-bottom: 30px;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 3px solid red;
+}
+.topSection{
+  width: 100%;
+  height: 20%;
+}
+
+.infoImgSection{
+  height: 100%;
+  width: 100%;
+}
+
+.middleSection{
+  flex-grow: 1;
+  width: 100%;
+  height: 70%;
+  display: flex;
+  flex-direction: row;
+}
+
+.snoSection{
+  height: 100%;
+}
+
+.snoImgSection{
+  height: 100%;
+}
+
+
+.textarea{
+  flex-grow: 1;
+  height: 100%;
+  position: relative;
+}
+
+.input{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: beige;
+  overflow: hidden;
+  padding: 2px;
+}
+
+.footerSection{
+  width: 100%;
+  height: 10%;
+}
+
+.footerImgSection{
+  height: 100%;
+  width: 100%;
+}
