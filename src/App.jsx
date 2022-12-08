@@ -3,6 +3,8 @@ import styles from './app.module.css'
 import evenPage from './assets/even.jpeg';
 import oddPage from './assets/odd.jpeg';
 import { useReactToPrint } from 'react-to-print';
+import {QUESTIONS} from './data';
+import QuestionsArea from './QuestionsArea'
 
 // main template
 import mainInfoSection from './assets/main_info_section.png';
@@ -25,63 +27,130 @@ const IMAGE_POSITIONS = {
   FOOTER: 'footer'
 }
 
+
 function App() {
-  const mainRef = useRef()
+  const [quesitons, setQuestions] = useState(QUESTIONS)
+  // const mainRef = useRef()
   const [pages, setPages] = useState([
     {
       id: 1,
       ref: useRef(),
-      value: "1"
+      value: "1",
+      observerRef: useRef(),
     },
     {
       id: 2,
       ref: useRef(),
-      value: "2"
+      value: "2",
+      observerRef: useRef(),
     },
-    {
-      id: 3,
-      ref: useRef(),
-      value: "3"
-    },
-    {
-      id: 4,
-      ref: useRef(),
-      value: "4"
-    },
-    {
-      id: 5,
-      ref: useRef(),
-      value: "5"
-    },
-    {
-      id: 6,
-      ref: useRef(),
-      value: "6"
-    }
+    // {
+    //   id: 3,
+    //   ref: useRef(),
+    //   value: "3",
+    //   observer: null,
+    // },
+    // {
+    //   id: 4,
+    //   ref: useRef(),
+    //   value: "4",
+    //   observer: null,
+    // },
+    // {
+    //   id: 5,
+    //   ref: useRef(),
+    //   value: "5"
+    // },
+    // {
+    //   id: 6,
+    //   ref: useRef(),
+    //   value: "6"
+    // }
   ])
   
-  const handleChange = (e, index) => {
-    const {current = {}} = pages[index].ref
-    const {clientHeight, scrollHeight} = current
-    const isOverflow = scrollHeight > clientHeight;
-    console.log({isOverflow, current, e})
-    setPages(pages.map((p,i) => {
-      if(i === index) {
-        p.value = e.target.value;
+  // const handleChange = (e, index) => {
+  //   const {current = {}} = pages[index].ref
+  //   const {clientHeight, scrollHeight} = current
+  //   const isOverflow = scrollHeight > clientHeight;
+  //   console.log({isOverflow, current, e})
+  //   setPages(pages.map((p,i) => {
+  //     if(i === index) {
+  //       p.value = e.target.value;
+  //     }
+  //     return p;
+  //   }))
+  //   if(isOverflow) {
+  //     pages[index+1].ref.current.focus()
+  //   }
+  // }
+
+  // const handlePrint = useReactToPrint({
+  //   content: () => mainRef.current,
+  // });
+  
+  const handleSpace = (e, line) => {
+    const queIndex = Number(e.target.dataset.questionIndex)
+    console.log(">>> add space in question: ", queIndex)
+    setQuestions(quesitons.map((q, i) => {
+      if(i === queIndex) {
+        let l = q.space + line;
+        if(l < 1) l = 1;
+        if(l > 5) l = 5;
+        q.space = l
       }
-      return p;
+      return q;
     }))
-    if(isOverflow) {
-      pages[index+1].ref.current.focus()
-    }
   }
 
-  const handlePrint = useReactToPrint({
-    content: () => mainRef.current,
-  });
-  
+  const handleSpillOver = (pageIndex, element, observer) => {
+    // console.log(">>>> handle spill in page: ", {pageIndex, children: pages[nextPage].ref.current.children.length})
+    // const element = pages?.[pageIndex].ref.current?.removeChild(elementt)
+    const nextPage = pageIndex+1;
+    console.log(">>>> handle spill in page: ", {pageIndex})
+
+    if(nextPage < pages.length && pages?.[nextPage].ref.current){
+      
+      element.setAttribute('id', `page-target-${nextPage}`)
+      console.log(">>> updaed element shift from : ", {pageIndex, element})
+      if(pages?.[nextPage].ref.current) {
+        console.log(">>> already children: ", {children: pages[nextPage].ref.current.children.length})
+        pages[nextPage].ref.current.prepend(element)
+        // pages[pageIndex].ref.current.removeChild(element)
+      } else {
+        console.log(">>>> ref current is null for page: ", nextPage)
+      }
+      if(pages?.[nextPage].observerRef.current) {
+        pages[nextPage].observerRef.current.observe(element)
+      } else {
+        console.log(">>>>> observer is not present for page: ", nextPage )
+      }
+      
+      // observer.unobserve(element)
+      console.log(">>> element shift to : ", nextPage)
+    } else {
+      // setPages([...pages, {
+      //   id: nextPage+1,
+      //   ref: useRef(),
+      //   value: "1",
+      //   observerRef: useRef(),
+      // }])
+      console.log(">>> new pages added for :", nextPage)
+    }
+    
+  }
+
+  // const registerObserver = (pageIndex, observer) => {
+  //   console.log(">>> observer registered for page: ", pageIndex, observer)
+  //   setPages(pages.map((p,i) => {
+  //     if(pageIndex === i) {
+  //       p.observer = observer
+  //     }
+  //     return p
+  //   }))
+  // }
+
   return (
-    <div ref={mainRef} className={styles.main}>
+    <div className={styles.main}>
       {
         pages.map((item, index) => {
           return (
@@ -99,14 +168,15 @@ function App() {
                 <div className={styles.snoSection}>
                   <img src={getImage(IMAGE_POSITIONS.MIDDLE, index)} className={styles.snoImgSection} />
                 </div>
-                <div className={styles.textarea}>
-                  <textarea 
-                    ref={pages[index].ref} 
-                    className={styles.input} 
-                    onChange={(e) => {handleChange(e, index)}}
-                    value={item.value}
+                
+                  <QuestionsArea 
+                    item={item} 
+                    index={index} 
+                    quesitons={quesitons} 
+                    handleSpace={handleSpace}
+                    handleSpillOver={handleSpillOver}
+                    // registerObserver={registerObserver}
                   />
-                </div>
               </div>
               
               {/* footer section */}
@@ -117,7 +187,7 @@ function App() {
           )
         })
       }
-      <button onClick={handlePrint}>Print this out!</button>
+      {/* <button onClick={handlePrint}>Print this out!</button> */}
     </div>
   )
 }
