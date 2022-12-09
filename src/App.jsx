@@ -44,50 +44,18 @@ function App() {
       value: "2",
       observerRef: useRef(),
     },
-    // {
-    //   id: 3,
-    //   ref: useRef(),
-    //   value: "3",
-    //   observer: null,
-    // },
-    // {
-    //   id: 4,
-    //   ref: useRef(),
-    //   value: "4",
-    //   observer: null,
-    // },
-    // {
-    //   id: 5,
-    //   ref: useRef(),
-    //   value: "5"
-    // },
-    // {
-    //   id: 6,
-    //   ref: useRef(),
-    //   value: "6"
-    // }
   ])
   
-  // const handleChange = (e, index) => {
-  //   const {current = {}} = pages[index].ref
-  //   const {clientHeight, scrollHeight} = current
-  //   const isOverflow = scrollHeight > clientHeight;
-  //   console.log({isOverflow, current, e})
-  //   setPages(pages.map((p,i) => {
-  //     if(i === index) {
-  //       p.value = e.target.value;
-  //     }
-  //     return p;
-  //   }))
-  //   if(isOverflow) {
-  //     pages[index+1].ref.current.focus()
-  //   }
-  // }
+  useEffect(() => {
+    if(!quesitons.length) return
+    console.log(">>>> question updated", quesitons)
+  }, [quesitons])
 
-  // const handlePrint = useReactToPrint({
-  //   content: () => mainRef.current,
-  // });
-  
+  useEffect(() => {
+    if(!pages.length) return
+    console.log(">>>> pages updated", pages)
+  }, [pages])
+
   const handleSpace = (e, line) => {
     const queIndex = Number(e.target.dataset.questionIndex)
     console.log(">>> add space in question: ", queIndex)
@@ -106,15 +74,23 @@ function App() {
     // console.log(">>>> handle spill in page: ", {pageIndex, children: pages[nextPage].ref.current.children.length})
     // const element = pages?.[pageIndex].ref.current?.removeChild(elementt)
     const nextPage = pageIndex+1;
-    console.log(">>>> handle spill in page: ", {pageIndex})
+    // console.log(">>>> handle spill in page: ", {pageIndex})
 
     if(nextPage < pages.length && pages?.[nextPage].ref.current){
       
       element.setAttribute('id', `page-target-${nextPage}`)
-      console.log(">>> updaed element shift from : ", {pageIndex, element})
+      // console.log(">>> updaed element shift from : ", {pageIndex, element})
       if(pages?.[nextPage].ref.current) {
         console.log(">>> already children: ", {children: pages[nextPage].ref.current.children.length})
-        pages[nextPage].ref.current.prepend(element)
+        if(pages[nextPage].ref.current.children.length) {
+          console.log(">>> first child : ", pages[nextPage].ref.current.children[0])
+          pages[nextPage].ref.current.prepend(element)
+          // pages[nextPage].ref.current.insertBefore(element, pages[nextPage].ref.current.children[0])
+        } else {
+          // console.log(">>>> apppended")
+          pages[nextPage].ref.current.append(element)
+        }
+        
         // pages[pageIndex].ref.current.removeChild(element)
       } else {
         console.log(">>>> ref current is null for page: ", nextPage)
@@ -126,28 +102,18 @@ function App() {
       }
       
       // observer.unobserve(element)
-      console.log(">>> element shift to : ", nextPage)
+      // console.log(">>> element shift to : ", nextPage)
     } else {
-      // setPages([...pages, {
-      //   id: nextPage+1,
-      //   ref: useRef(),
-      //   value: "1",
-      //   observerRef: useRef(),
-      // }])
+      setPages([...pages, {
+        id: nextPage+1,
+        ref: useRef(),
+        value: "1",
+        observerRef: useRef(),
+      }])
       console.log(">>> new pages added for :", nextPage)
     }
     
   }
-
-  // const registerObserver = (pageIndex, observer) => {
-  //   console.log(">>> observer registered for page: ", pageIndex, observer)
-  //   setPages(pages.map((p,i) => {
-  //     if(pageIndex === i) {
-  //       p.observer = observer
-  //     }
-  //     return p
-  //   }))
-  // }
 
   return (
     <div className={styles.main}>

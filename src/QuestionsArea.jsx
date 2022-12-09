@@ -2,41 +2,49 @@ import React, { useEffect, useRef } from 'react'
 import styles from './questionArea.module.css';
 
 function QuestionsArea({item, index, quesitons, handleSpace, handleSpillOver}) {
-    console.log(">>>> question area for ", index)
+    // console.log(">>>> question area for ", index)
     const pageObserverRootRef = useRef()
 
     useEffect(() => {
-        console.log(">>> question area useeffect called : ", {root:pageObserverRootRef?.current, index })
+        // console.log(">>> question area useeffect called : ", {root:pageObserverRootRef?.current, index })
         if(pageObserverRootRef?.current) {
-            console.log(">>> page ready ", {root:pageObserverRootRef?.current, index })
+            if(item.observerRef.current) item.observerRef.current.disconnect()
+
+            // console.log(">>> page ready ", {root:pageObserverRootRef?.current, index })
             const allElement = document.querySelectorAll(`#page-target-${index}`)
-            console.log({allElement})
+            // console.log({allElement})
             let options = {
                 root: pageObserverRootRef?.current,
                 rootMargin: '0px',
-                threshold: 0.1
+                threshold: 1
             }
-            let observer = new IntersectionObserver((entries, self) => {
-                console.log({entries})
+            item.observerRef.current = new IntersectionObserver((entries, self) => {
+                // console.log({entries})
                 entries.forEach(entry => {
                     if(!entry.isIntersecting){
-                        console.log({out: entry.target.innerHTML})
+                        // console.log({out: entry.target.innerHTML})
                         handleSpillOver(index, entry.target, self)
                     }
                 })
             }, options);
 
+            // const {current: currentObserver} = item.observerRef
+
             allElement.forEach(ele => {
-                observer.observe(ele)
+                item.observerRef.current.observe(ele)
             })
 
-            item.observerRef.current = observer;
+            // item.observerRef.current = observer;
+        }
+
+        return () => {
+            item.observerRef.current.disconnect()
         }
 
     },[pageObserverRootRef?.current])
     
   return (
-    <div ref={pageObserverRootRef} className={styles.textarea}>
+    <div ref={pageObserverRootRef} id={`pages-${index}`} className={styles.textarea}>
         <div 
         ref={item.ref} 
         className={styles.input} 
@@ -44,12 +52,12 @@ function QuestionsArea({item, index, quesitons, handleSpace, handleSpillOver}) {
         {
             (index==0) && quesitons?.map(({text, space}, qi) => {
             return (<>
-                <div data-page-index={index} id={`page-target-${index}`} className={styles.question} dangerouslySetInnerHTML={{__html: text}}  />
+                <div id={`page-target-${index}`} className={styles.question} dangerouslySetInnerHTML={{__html: text}}  />
                 {
                 [...Array(space)].map((line, li) => {
                     return (
                     <>
-                    <div data-page-index={index} id={`page-target-${index}`} className={styles.line}>
+                    <div id={`page-target-${index}`} className={styles.line}>
                         {li+1}
                         {
                             (space === li+1) && (
