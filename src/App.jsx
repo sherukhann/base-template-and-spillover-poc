@@ -58,7 +58,7 @@ function App() {
 
   const handleSpace = (e, line) => {
     const queIndex = Number(e.target.dataset.questionIndex)
-    console.log(">>> add space in question: ", queIndex)
+    // if(queIndex !== 0) return;
     setQuestions(quesitons.map((q, i) => {
       if(i === queIndex) {
         let l = q.space + line;
@@ -68,41 +68,21 @@ function App() {
       }
       return q;
     }))
+
+    console.log(">>> add space in question: ", queIndex)
   }
 
   const handleSpillOver = (pageIndex, element, observer) => {
-    // console.log(">>>> handle spill in page: ", {pageIndex, children: pages[nextPage].ref.current.children.length})
-    // const element = pages?.[pageIndex].ref.current?.removeChild(elementt)
+    console.log(">>>> handle spillover called with: ", {pageIndex, target: element.innerHTML, observer })
+    if(pageIndex == 1) return
     const nextPage = pageIndex+1;
-    // console.log(">>>> handle spill in page: ", {pageIndex})
-
     if(nextPage < pages.length && pages?.[nextPage].ref.current){
-      
+      observer.unobserve(element)
       element.setAttribute('id', `page-target-${nextPage}`)
-      // console.log(">>> updaed element shift from : ", {pageIndex, element})
-      if(pages?.[nextPage].ref.current) {
-        console.log(">>> already children: ", {children: pages[nextPage].ref.current.children.length})
-        if(pages[nextPage].ref.current.children.length) {
-          console.log(">>> first child : ", pages[nextPage].ref.current.children[0])
-          pages[nextPage].ref.current.prepend(element)
-          // pages[nextPage].ref.current.insertBefore(element, pages[nextPage].ref.current.children[0])
-        } else {
-          // console.log(">>>> apppended")
-          pages[nextPage].ref.current.append(element)
-        }
-        
-        // pages[pageIndex].ref.current.removeChild(element)
-      } else {
-        console.log(">>>> ref current is null for page: ", nextPage)
-      }
-      if(pages?.[nextPage].observerRef.current) {
-        pages[nextPage].observerRef.current.observe(element)
-      } else {
-        console.log(">>>>> observer is not present for page: ", nextPage )
-      }
       
-      // observer.unobserve(element)
-      // console.log(">>> element shift to : ", nextPage)
+      pages[nextPage].ref.current.prepend(element)
+      pages[nextPage].observerRef.current.observe(element)
+      console.log(">>> element shift to : ", nextPage)
     } else {
       setPages([...pages, {
         id: nextPage+1,
@@ -112,7 +92,6 @@ function App() {
       }])
       console.log(">>> new pages added for :", nextPage)
     }
-    
   }
 
   return (

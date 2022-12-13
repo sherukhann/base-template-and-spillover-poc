@@ -2,49 +2,50 @@ import React, { useEffect, useRef } from 'react'
 import styles from './questionArea.module.css';
 
 function QuestionsArea({item, index, quesitons, handleSpace, handleSpillOver}) {
-    // console.log(">>>> question area for ", index)
-    const pageObserverRootRef = useRef()
 
     useEffect(() => {
-        // console.log(">>> question area useeffect called : ", {root:pageObserverRootRef?.current, index })
-        if(pageObserverRootRef?.current) {
+        if(item.ref.current) {
             if(item.observerRef.current) item.observerRef.current.disconnect()
 
-            // console.log(">>> page ready ", {root:pageObserverRootRef?.current, index })
             const allElement = document.querySelectorAll(`#page-target-${index}`)
-            // console.log({allElement})
             let options = {
-                root: pageObserverRootRef?.current,
+                root: item.ref.current,
                 rootMargin: '0px',
                 threshold: 1
             }
             item.observerRef.current = new IntersectionObserver((entries, self) => {
-                // console.log({entries})
+                console.log(">>> entried : ", {entries, index})
+                entries.reverse()
                 entries.forEach(entry => {
                     if(!entry.isIntersecting){
-                        // console.log({out: entry.target.innerHTML})
+                        console.log({out: entry.target.innerHTML})
                         handleSpillOver(index, entry.target, self)
                     }
                 })
             }, options);
 
-            // const {current: currentObserver} = item.observerRef
-
             allElement.forEach(ele => {
                 item.observerRef.current.observe(ele)
             })
 
-            // item.observerRef.current = observer;
         }
 
         return () => {
             item.observerRef.current.disconnect()
         }
 
-    },[pageObserverRootRef?.current])
+    },[item.ref.current])
+
+    // useEffect(() => {
+    //     const allElement = document.querySelectorAll(`#page-target-${index}`)
+    //     console.log(">>> observer target added :", {allElement, index})
+    //     allElement.forEach(ele => {
+    //         item.observerRef.current.observe(ele)
+    //     })
+    // },[quesitons])
     
   return (
-    <div ref={pageObserverRootRef} id={`pages-${index}`} className={styles.textarea}>
+    <div className={styles.textarea}>
         <div 
         ref={item.ref} 
         className={styles.input} 
@@ -76,8 +77,6 @@ function QuestionsArea({item, index, quesitons, handleSpace, handleSpillOver}) {
             })
         }
         </div>
-        {/* observer
-        <div id={`page-observer-${index}`} className={styles.observer}></div> */}
     </div>
   )
 }
