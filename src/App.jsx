@@ -29,27 +29,26 @@ const IMAGE_POSITIONS = {
 
 
 function App() {
-  const [quesitons, setQuestions] = useState(QUESTIONS)
-  // const mainRef = useRef()
+  const [questions, setQuestions] = useState(QUESTIONS)
   const [pages, setPages] = useState([
     {
       id: 1,
-      ref: useRef(),
+      // ref: useRef(),
       value: "1",
-      observerRef: useRef(),
+      // observerRef: useRef(),
     },
     {
       id: 2,
-      ref: useRef(),
+      // ref: useRef(),
       value: "2",
-      observerRef: useRef(),
+      // observerRef: useRef(),
     },
   ])
   
   useEffect(() => {
-    if(!quesitons.length) return
-    console.log(">>>> question updated", quesitons)
-  }, [quesitons])
+    if(!questions.length) return
+    console.log(">>>> question updated", questions)
+  }, [questions])
 
   useEffect(() => {
     if(!pages.length) return
@@ -58,40 +57,56 @@ function App() {
 
   const handleSpace = (e, line) => {
     const queIndex = Number(e.target.dataset.questionIndex)
-    // if(queIndex !== 0) return;
-    setQuestions(quesitons.map((q, i) => {
-      if(i === queIndex) {
-        let l = q.space + line;
-        if(l < 1) l = 1;
-        if(l > 5) l = 5;
-        q.space = l
+    const currentQuestion = questions[queIndex];
+    const newSpace = currentQuestion.space + line
+    setQuestions((questions) => {
+      return {...questions,
+        [queIndex] : {
+          ...questions[queIndex],
+          space: newSpace > 1 ? newSpace : 1,
+        }
       }
-      return q;
-    }))
+    })
 
     console.log(">>> add space in question: ", queIndex)
   }
 
-  const handleSpillOver = (pageIndex, element, observer) => {
-    console.log(">>>> handle spillover called with: ", {pageIndex, target: element.innerHTML, observer })
-    if(pageIndex == 1) return
+  const handleSpillOver = (pageIndex, element) => {
+    console.log(">>>> handle spillover called with: ", {pageIndex, element })
     const nextPage = pageIndex+1;
-    if(nextPage < pages.length && pages?.[nextPage].ref.current){
-      observer.unobserve(element)
+    if(nextPage < pages.length && pages?.[nextPage].ref.current && pages?.[nextPage].observerRef.current){
       element.setAttribute('id', `page-target-${nextPage}`)
       
       pages[nextPage].ref.current.prepend(element)
       pages[nextPage].observerRef.current.observe(element)
       console.log(">>> element shift to : ", nextPage)
     } else {
-      setPages([...pages, {
-        id: nextPage+1,
-        ref: useRef(),
-        value: "1",
-        observerRef: useRef(),
-      }])
+      setPages((pages) => {
+        return [...pages, {
+          id: pages.length + 1,
+          // ref: useRef(),
+          value: "1",
+          // observerRef: useRef(),
+        }]
+      })
       console.log(">>> new pages added for :", nextPage)
     }
+  }
+
+  const registerRef = (index, questionRef, observerRef) => {
+    console.log(">>> register for : ", index, questionRef, observerRef)
+
+      setPages((pages) => {
+        return pages.map((p,i) => {
+          if(i === index) {
+            p.ref = questionRef,
+            p.observerRef = observerRef
+          }
+          return p
+        })
+      })
+
+      console.log(">>> registration done for: ", index)
   }
 
   return (
@@ -117,9 +132,10 @@ function App() {
                   <QuestionsArea 
                     item={item} 
                     index={index} 
-                    quesitons={quesitons} 
+                    questions={questions} 
                     handleSpace={handleSpace}
                     handleSpillOver={handleSpillOver}
+                    registerRef={registerRef}
                     // registerObserver={registerObserver}
                   />
               </div>
