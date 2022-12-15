@@ -1,8 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import styles from './app.module.css'
-import evenPage from './assets/even.jpeg';
-import oddPage from './assets/odd.jpeg';
-import { useReactToPrint } from 'react-to-print';
+// import { useReactToPrint } from 'react-to-print';
 import {QUESTIONS} from './data';
 import QuestionsArea from './QuestionsArea'
 
@@ -55,32 +53,35 @@ function App() {
     console.log(">>>> pages updated", pages)
   }, [pages])
 
-  const handleSpace = (e, line) => {
-    const queIndex = Number(e.target.dataset.questionIndex)
-    const currentQuestion = questions[queIndex];
-    const newSpace = currentQuestion.space + line
-    setQuestions((questions) => {
-      return {...questions,
-        [queIndex] : {
-          ...questions[queIndex],
-          space: newSpace > 1 ? newSpace : 1,
-        }
-      }
-    })
+  // const handleSpace = (e, line) => {
+  //   const queIndex = Number(e.target.dataset.questionIndex)
+  //   const currentQuestion = questions[queIndex];
+  //   const newSpace = currentQuestion.space + line
+  //   setQuestions((questions) => {
+  //     return {...questions,
+  //       [queIndex] : {
+  //         ...questions[queIndex],
+  //         space: newSpace > 1 ? newSpace : 1,
+  //       }
+  //     }
+  //   })
 
-    console.log(">>> add space in question: ", queIndex)
-  }
+  //   console.log(">>> add space in question: ", queIndex)
+  // }
 
-  const handleSpillOver = (pageIndex, element) => {
-    console.log(">>>> handle spillover called with: ", {pageIndex, element })
+  const handleSpillOver = (element) => {
+    console.log(">>>> handle spillover called with: ", {element })
+    const pageIndex = Number(element.dataset.pageIndex)
     const nextPage = pageIndex+1;
     if(nextPage < pages.length && pages?.[nextPage].ref.current && pages?.[nextPage].observerRef.current){
-      element.setAttribute('id', `page-target-${nextPage}`)
       
+      element.setAttribute('id', `page-target-${nextPage}`)
+      element.setAttribute('data-page-index', `${nextPage}`)
       pages[nextPage].ref.current.prepend(element)
       pages[nextPage].observerRef.current.observe(element)
       console.log(">>> element shift to : ", nextPage)
     } else {
+
       setPages((pages) => {
         return [...pages, {
           id: pages.length + 1,
@@ -94,7 +95,7 @@ function App() {
   }
 
   const registerRef = (index, questionRef, observerRef) => {
-    console.log(">>> register for : ", index, questionRef, observerRef)
+    // console.log(">>> register for : ", index, questionRef, observerRef)
 
       setPages((pages) => {
         return pages.map((p,i) => {
@@ -106,7 +107,7 @@ function App() {
         })
       })
 
-      console.log(">>> registration done for: ", index)
+      // console.log(">>> registration done for: ", index)
   }
 
   return (
@@ -133,7 +134,7 @@ function App() {
                     item={item} 
                     index={index} 
                     questions={questions} 
-                    handleSpace={handleSpace}
+                    // handleSpace={handleSpace}
                     handleSpillOver={handleSpillOver}
                     registerRef={registerRef}
                     // registerObserver={registerObserver}
