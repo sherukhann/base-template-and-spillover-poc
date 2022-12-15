@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import styles from './app.module.css'
 // import { useReactToPrint } from 'react-to-print';
 import {QUESTIONS} from './data';
@@ -28,18 +28,15 @@ const IMAGE_POSITIONS = {
 
 function App() {
   const [questions, setQuestions] = useState(QUESTIONS)
+
   const [pages, setPages] = useState([
     {
       id: 1,
-      // ref: useRef(),
       value: "1",
-      // observerRef: useRef(),
     },
     {
       id: 2,
-      // ref: useRef(),
       value: "2",
-      // observerRef: useRef(),
     },
   ])
   
@@ -49,54 +46,40 @@ function App() {
   }, [questions])
 
   useEffect(() => {
-    if(!pages.length) return
     console.log(">>>> pages updated", pages)
   }, [pages])
 
-  // const handleSpace = (e, line) => {
-  //   const queIndex = Number(e.target.dataset.questionIndex)
-  //   const currentQuestion = questions[queIndex];
-  //   const newSpace = currentQuestion.space + line
-  //   setQuestions((questions) => {
-  //     return {...questions,
-  //       [queIndex] : {
-  //         ...questions[queIndex],
-  //         space: newSpace > 1 ? newSpace : 1,
-  //       }
-  //     }
-  //   })
-
-  //   console.log(">>> add space in question: ", queIndex)
-  // }
-
-  const handleSpillOver = (element) => {
-    console.log(">>>> handle spillover called with: ", {element })
+  const handleSpillOver = useCallback((element) => {
+    console.log(">>>> handle spillover called with: ", {element, pages })
     const pageIndex = Number(element.dataset.pageIndex)
     const nextPage = pageIndex+1;
+
     if(nextPage < pages.length && pages?.[nextPage].ref.current && pages?.[nextPage].observerRef.current){
-      
       element.setAttribute('id', `page-target-${nextPage}`)
       element.setAttribute('data-page-index', `${nextPage}`)
       pages[nextPage].ref.current.prepend(element)
       pages[nextPage].observerRef.current.observe(element)
       console.log(">>> element shift to : ", nextPage)
-    } else {
+    }
+
+    if(nextPage+1 === pages.length){
 
       setPages((pages) => {
-        return [...pages, {
-          id: pages.length + 1,
-          // ref: useRef(),
-          value: "1",
-          // observerRef: useRef(),
-        }]
+        if(nextPage+1 === pages.length) {
+          return [...pages, {
+            id: pages.length + 1,
+            value: "1",
+          }]
+        } else {
+          return [...pages]
+        }
       })
-      console.log(">>> new pages added for :", nextPage)
+      console.log(">>>### new pages added for :", nextPage+1)
     }
-  }
+
+  }, [pages.length])
 
   const registerRef = (index, questionRef, observerRef) => {
-    // console.log(">>> register for : ", index, questionRef, observerRef)
-
       setPages((pages) => {
         return pages.map((p,i) => {
           if(i === index) {
@@ -106,8 +89,6 @@ function App() {
           return p
         })
       })
-
-      // console.log(">>> registration done for: ", index)
   }
 
   return (
@@ -137,6 +118,7 @@ function App() {
                     // handleSpace={handleSpace}
                     handleSpillOver={handleSpillOver}
                     registerRef={registerRef}
+                    pages={pages}
                     // registerObserver={registerObserver}
                   />
               </div>

@@ -1,16 +1,16 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styles from './questionArea.module.css';
 
-function QuestionsArea({item, index, questions, handleSpillOver, registerRef}) {
+function QuestionsArea({item, index, questions, handleSpillOver, registerRef, pages}) {
     const questionRef = useRef()
     const observerRef = useRef()
 
-    const observerAllNode = () => {
-        const allElement = document.querySelectorAll(`#page-target-${index}`)
-        allElement.forEach(ele => {
-            observerRef.current.observe(ele)
-        })
-    }
+    // const observerAllNode = () => {
+    //     const allElement = document.querySelectorAll(`#page-target-${index}`)
+    //     allElement.forEach(ele => {
+    //         observerRef.current.observe(ele)
+    //     })
+    // }
 
     useEffect(() => {
         if(questionRef.current) {
@@ -46,30 +46,29 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef}) {
             observerRef.current.disconnect()
         }
 
-    },[questionRef.current])
+    },[questionRef.current, handleSpillOver])
 
-    useEffect(() => {
-        if(observerRef.current) {
-            observerAllNode()
-        }  
-    },[questions])
+    // useEffect(() => {
+    //     if(observerRef.current) {
+    //         observerAllNode()
+    //     }  
+    // },[questions])
     
     
     const handleSpace = (e, queIndex, line) => {
+        const currentPage = Number(e.target.parentNode.parentNode.dataset.pageIndex)
         const questionDiv = document.querySelectorAll(`[data-question-id="${queIndex}"]`)
         const lastNode = questionDiv[questionDiv.length-1] 
-        console.log(">>> current question : ", questionDiv, lastNode)
+        console.log(">>> add remove current question : ", {questionDiv, lastNode, index, currentPage, rrr: questionRef.current, obrr: item.observerRef.current})
         if(line > 0) {
             const space = document.createElement("div")
-            space.setAttribute('id', `page-target-${index}`)
+            space.setAttribute('id', `page-target-${currentPage}`)
             space.setAttribute('class', `${styles.line}`)
-            space.setAttribute('data-page-index', `${index}`)
+            space.setAttribute('data-page-index', `${currentPage}`)
             space.setAttribute('data-question-id', `${queIndex}`)
             lastNode.after(space)
-            observerAllNode()
-            console.log(">>> child added for question : ", queIndex, space)
+            pages[currentPage].observerRef.current.observe(space)
         } else {
-            console.log(">>> remove last node: ", lastNode)
             if(questionDiv.length > 2) {
                 lastNode.parentNode.removeChild(lastNode)
             }
@@ -87,7 +86,7 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef}) {
                 <div data-question-id={qi} data-page-index={index} id={`page-target-${index}`} className={styles.question} >
                     <div dangerouslySetInnerHTML={{__html: text}} />
                     <div className={styles.addSpaceBtns}>
-                        <button data-question-index={qi} onClick={(e) => handleSpace(e,qi, 1)} >add</button>
+                        <button data-question-index={qi} onClick={(e) => handleSpace(e, qi, 1)} >add</button>
                         <button data-question-index={qi} onClick={(e) => handleSpace(e, qi, -1)} >remove</button>
                     </div>
                 </div>
