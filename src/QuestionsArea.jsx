@@ -7,8 +7,6 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef}) {
 
     const observerAllNode = () => {
         const allElement = document.querySelectorAll(`#page-target-${index}`)
-        // console.log(">>> observer target added :", {allElement, index})
-        // console.log(">>> childrebn: ", questionRef.current.children)
         allElement.forEach(ele => {
             observerRef.current.observe(ele)
         })
@@ -31,7 +29,6 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef}) {
                     if(!entry.isIntersecting){
                         self.unobserve(entry.target)
                         console.log({out: entry.target})
-                        const pageIndex = entry.target.dataset.pageIndex
                         handleSpillOver(entry.target)
                     }
                 })
@@ -59,24 +56,24 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef}) {
     
     
     const handleSpace = (e, queIndex, line) => {
-        const questionDiv = document.querySelector(`#question-id-${queIndex}`)
+        const questionDiv = document.querySelectorAll(`[data-question-id="${queIndex}"]`)
+        const lastNode = questionDiv[questionDiv.length-1] 
+        console.log(">>> current question : ", questionDiv, lastNode)
         if(line > 0) {
             const space = document.createElement("div")
             space.setAttribute('id', `page-target-${index}`)
             space.setAttribute('class', `${styles.line}`)
             space.setAttribute('data-page-index', `${index}`)
-            questionDiv.append(space)
+            space.setAttribute('data-question-id', `${queIndex}`)
+            lastNode.after(space)
             observerAllNode()
             console.log(">>> child added for question : ", queIndex, space)
         } else {
-            const children = questionDiv.children
-            if(children.length > 2) {
-                const lastNode = children[children.length-1]
-                questionDiv.removeChild(lastNode)
-
+            console.log(">>> remove last node: ", lastNode)
+            if(questionDiv.length > 2) {
+                lastNode.parentNode.removeChild(lastNode)
             }
         }
-
     }
   return (
     <div className={styles.textarea}>
@@ -86,8 +83,8 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef}) {
         >
         {
             (index==0) && Object.values(questions)?.map(({text, space}, qi) => {
-            return (<div key={`question-id-${qi}`} id={`question-id-${qi}`}>
-                <div data-page-index={index} id={`page-target-${index}`} className={styles.question} >
+            return (<>
+                <div data-question-id={qi} data-page-index={index} id={`page-target-${index}`} className={styles.question} >
                     <div dangerouslySetInnerHTML={{__html: text}} />
                     <div className={styles.addSpaceBtns}>
                         <button data-question-index={qi} onClick={(e) => handleSpace(e,qi, 1)} >add</button>
@@ -96,10 +93,10 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef}) {
                 </div>
                 {
                 [...Array(space)].map((line, li) => {
-                    return <div key={`line-${li}`} data-page-index={index} id={`page-target-${index}`} className={styles.line} />
+                    return <div key={`line-${li}`} data-question-id={qi} data-page-index={index} id={`page-target-${index}`} className={styles.line} />
                 })
                 }
-            </div>)
+            </>)
             })
         }
         </div>
