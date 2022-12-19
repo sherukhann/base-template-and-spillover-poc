@@ -39,18 +39,8 @@ function App() {
       value: "2",
     },
   ])
-  
-  useEffect(() => {
-    if(!questions.length) return
-    console.log(">>>> question updated", questions)
-  }, [questions])
-
-  useEffect(() => {
-    console.log(">>>> pages updated", pages)
-  }, [pages])
 
   const handleSpillOver = useCallback((element) => {
-    console.log(">>>> handle spillover called with: ", {element, pages })
     const pageIndex = Number(element.dataset.pageIndex)
     const nextPage = pageIndex+1;
 
@@ -59,7 +49,6 @@ function App() {
       element.setAttribute('data-page-index', `${nextPage}`)
       pages[nextPage].ref.current.prepend(element)
       pages[nextPage].observerRef.current.observe(element)
-      console.log(">>> element shift to : ", nextPage)
     }
 
     if(nextPage+1 === pages.length){
@@ -74,7 +63,7 @@ function App() {
           return [...pages]
         }
       })
-      console.log(">>>### new pages added for :", nextPage+1)
+      // console.log(">>>### new pages added for :", nextPage+1)
     }
 
   }, [pages.length])
@@ -89,6 +78,38 @@ function App() {
           return p
         })
       })
+  }
+
+  const moveUpword = (pageIndex) => {
+    let currentPage = Number(pageIndex);
+    let nextPage = currentPage + 1;
+    while(nextPage < pages.length) {
+      const nextPageNodes = pages[nextPage].ref.current.children
+      if(nextPageNodes.length) {
+        
+        const firstChild = nextPageNodes[0]
+        pages[nextPage].observerRef.current.unobserve(firstChild)
+
+        firstChild.setAttribute('id', `page-target-${currentPage}`)
+        firstChild.setAttribute('data-page-index', `${currentPage}`)
+        pages[currentPage].ref.current.append(firstChild)
+        pages[currentPage].observerRef.current.observe(firstChild)
+
+        currentPage = nextPage;
+        nextPage += 1;
+      } else {
+        if(nextPage < pages.length-1){
+          setPages((pages) => {
+            if(nextPage < pages.length-1) {
+              return pages.slice(0,pages.length-1)
+            } else {
+              return [...pages]
+            }
+          })
+        }
+        break;
+      }
+    }
   }
 
   return (
@@ -119,6 +140,7 @@ function App() {
                     handleSpillOver={handleSpillOver}
                     registerRef={registerRef}
                     pages={pages}
+                    moveUpword={moveUpword}
                     // registerObserver={registerObserver}
                   />
               </div>

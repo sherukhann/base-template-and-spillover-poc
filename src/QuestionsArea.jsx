@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import styles from './questionArea.module.css';
 
-function QuestionsArea({item, index, questions, handleSpillOver, registerRef, pages}) {
+function QuestionsArea({item, index, questions, handleSpillOver, registerRef, pages, moveUpword}) {
     const questionRef = useRef()
     const observerRef = useRef()
 
@@ -15,7 +15,6 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef, pa
                 threshold: 1
             }
             observerRef.current = new IntersectionObserver((entries, self) => {
-                console.log(">>> entried : ", {entries, index})
                 entries.reverse()
                 entries.forEach(entry => {
                     if(!entry.isIntersecting){
@@ -60,6 +59,8 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef, pa
                 pages[currentPage].observerRef.current.unobserve(lastNode)
                 lastNode.parentNode.removeChild(lastNode)
                 countLine.innerHTML = questionDiv.length-2;
+                moveUpword(currentPage)
+                
             }
         }
     }
