@@ -5,17 +5,18 @@
 }
 
 .main {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
 }
 
 .page{
-  margin-bottom: 30px;
-  height: 100%;
-  width: 100%;
+  height: 29.7cm;
+  width: 21cm;
+  margin: auto;
   display: flex;
   flex-direction: column;
-  border: 3px solid red;
+  border: 1px solid red;
+  margin-bottom: 30px;
 }
 .topSection{
   width: 100%;
