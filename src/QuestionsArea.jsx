@@ -5,16 +5,8 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef, pa
     const questionRef = useRef()
     const observerRef = useRef()
 
-    // const observerAllNode = () => {
-    //     const allElement = document.querySelectorAll(`#page-target-${index}`)
-    //     allElement.forEach(ele => {
-    //         observerRef.current.observe(ele)
-    //     })
-    // }
-
     useEffect(() => {
         if(questionRef.current) {
-            // if(item.observerRef.current) item.observerRef.current.disconnect()
 
             const allElement = document.querySelectorAll(`#page-target-${index}`)
             let options = {
@@ -47,17 +39,10 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef, pa
         }
 
     },[questionRef.current, handleSpillOver])
-
-    // useEffect(() => {
-    //     if(observerRef.current) {
-    //         observerAllNode()
-    //     }  
-    // },[questions])
-    
     
     const handleSpace = (e, queIndex, line) => {
-        // const currentPage = Number(e.target.parentNode.parentNode.dataset.pageIndex)
         const questionDiv = document.querySelectorAll(`[data-question-id="${queIndex}"]`)
+        const countLine = document.querySelector(`#question-line-count-${queIndex}`)
         const lastNode = questionDiv[questionDiv.length-1] 
         const currentPage = lastNode.dataset.pageIndex
         // console.log(">>> add remove current question : ", {parent: lastNode.parentNode ,questionDiv, lastNode, index, currentPage, rrr: pages[currentPage].ref.current, obrr: pages[currentPage].observerRef.current})
@@ -69,10 +54,12 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef, pa
             space.setAttribute('data-question-id', `${queIndex}`)
             lastNode.after(space)
             pages[currentPage].observerRef.current.observe(space)
+            countLine.innerHTML = questionDiv.length
         } else {
             if(questionDiv.length > 2) {
                 pages[currentPage].observerRef.current.unobserve(lastNode)
                 lastNode.parentNode.removeChild(lastNode)
+                countLine.innerHTML = questionDiv.length-2;
             }
         }
     }
@@ -89,6 +76,7 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef, pa
                     <div dangerouslySetInnerHTML={{__html: text}} />
                     <div className={styles.addSpaceBtns}>
                         <button data-question-index={qi} onClick={(e) => handleSpace(e, qi, 1)} >add</button>
+                        <div className={styles.lineCount} id={`question-line-count-${qi}`}>{space}</div>
                         <button data-question-index={qi} onClick={(e) => handleSpace(e, qi, -1)} >remove</button>
                     </div>
                 </div>

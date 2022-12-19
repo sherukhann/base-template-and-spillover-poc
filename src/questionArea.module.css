@@ -40,6 +40,14 @@
     /* margin: 10px 0; */
 }
 
+.lineCount{
+    width: 20px;
+    height: 100%;
+    border-bottom: 2px solid;
+    margin: 0 5px;
+    text-align: center;
+}
+
 .observer {
     position: absolute;
     bottom: 0;
