@@ -56,10 +56,11 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef, pa
     
     
     const handleSpace = (e, queIndex, line) => {
-        const currentPage = Number(e.target.parentNode.parentNode.dataset.pageIndex)
+        // const currentPage = Number(e.target.parentNode.parentNode.dataset.pageIndex)
         const questionDiv = document.querySelectorAll(`[data-question-id="${queIndex}"]`)
         const lastNode = questionDiv[questionDiv.length-1] 
-        console.log(">>> add remove current question : ", {questionDiv, lastNode, index, currentPage, rrr: questionRef.current, obrr: item.observerRef.current})
+        const currentPage = lastNode.dataset.pageIndex
+        // console.log(">>> add remove current question : ", {parent: lastNode.parentNode ,questionDiv, lastNode, index, currentPage, rrr: pages[currentPage].ref.current, obrr: pages[currentPage].observerRef.current})
         if(line > 0) {
             const space = document.createElement("div")
             space.setAttribute('id', `page-target-${currentPage}`)
@@ -70,6 +71,7 @@ function QuestionsArea({item, index, questions, handleSpillOver, registerRef, pa
             pages[currentPage].observerRef.current.observe(space)
         } else {
             if(questionDiv.length > 2) {
+                pages[currentPage].observerRef.current.unobserve(lastNode)
                 lastNode.parentNode.removeChild(lastNode)
             }
         }
