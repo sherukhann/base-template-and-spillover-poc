@@ -1,3 +1,9 @@
+export const IMAGE_POSITIONS = {
+  TOP: 'top',
+  MIDDLE: 'middle',
+  FOOTER: 'footer'
+}
+
 export const QUESTIONS = {
     0: {
       text: '<p>Write all the integers between the given pair. Write them in the increasing order:<br />&ndash;4 and 4</p>',
@@ -32,4 +38,3 @@ export const QUESTIONS = {
     //   space: 1
     // }
 }
-  
